@@ -53,10 +53,6 @@ extension OnfidoConfig {
             try configFaceCapture(faceCapture: faceCapture, onfidoBuilder: onfidoBuilder)
         }
 
-        if let disableNFC = dictionary["disableNFC"] as? Bool, disableNFC {
-            onfidoBuilder.withNFC(.off)
-        }
-
         if let nfcOption = dictionary["nfcOption"] as? String {
             onfidoBuilder.withNFC(getNFCConfiguration(nfcOption))
         }

@@ -28,7 +28,7 @@ class OnfidoApi {
     };
   }
 
-  Future<String> getWorkflowRunId(String applicantId, String workflowId) async {
+  Future<Workflow> getWorkflowRun(String applicantId, String workflowId) async {
     if (workflowId.isEmpty) {
       throw Exception('Missing workflow id, please check your .env file or enter it manually');
     }
@@ -38,10 +38,10 @@ class OnfidoApi {
     );
 
     final response =
-        await http.post(Uri.parse("$_baseUrl/v3.5/workflow_runs"), headers: await getHeaders(), body: body);
+        await http.post(Uri.parse("$_baseUrl/v3.6/workflow_runs"), headers: await getHeaders(), body: body);
 
     if (response.statusCode == 201) {
-      return Workflow.fromJson(jsonDecode(response.body)).id!;
+      return Workflow.fromJson(jsonDecode(response.body));
     } else {
       throw Exception('Failed to create workflow run id');
     }

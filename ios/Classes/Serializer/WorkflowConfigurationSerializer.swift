@@ -41,5 +41,11 @@ extension WorkflowConfiguration {
         if let shouldUseMediaCallback = dictionary["shouldUseMediaCallback"] as? Bool, shouldUseMediaCallback {
             withMediaCallback(mediaCallback: CustomMediaCallback())
         }
+
+        if let shouldUseBiometricTokenCallback = dictionary["shouldUseBiometricTokenCallback"] as? Bool,
+           shouldUseBiometricTokenCallback
+        {
+            withEncryptedBiometricTokenHandler(handler: CustomEncryptedBiometricTokenCallback())
+        }
     }
 }

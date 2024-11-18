@@ -2,6 +2,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:onfido_sdk/onfido_sdk.dart';
+import 'package:onfido_sdk_example/model/biometric_token_callback.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 import 'dart:convert';
 
@@ -24,12 +25,30 @@ class _DevtoolsState extends State<Devtools> {
 
     if (devtoolsConfig['workflowRunId'] != null) {
       String workflowRunId = devtoolsConfig['workflowRunId'];
+      bool withBioCallback = devtoolsConfig['biometricTokenCallbackEnabled']?.toLowerCase() == 'true';
 
       startStudio(Config(
         sdkToken: token,
         workflowRunId: workflowRunId,
         hideLogo: parsedTestingConfig['hideLogo'],
-        logoCobrand: parsedTestingConfig['logoCobrand'],
+        localisation: {
+          'ios_strings_file_name': null,
+        },
+        disableNFC: parsedTestingConfig['disableNFC'],
+        shouldUseMediaCallbacks: parsedTestingConfig['shouldUseMediaCallbacks'],
+        shouldUseBiometricTokenCallback: withBioCallback,
+        disableMobileSdkAnalytics: parsedTestingConfig['disableMobileSdkAnalytics'],
+        theme: theme,
+      ));
+    }
+
+    if (devtoolsConfig['steps'] != null) {
+      var parsedClassicConfig = parseClassicConfig(devtoolsConfig['steps']);
+
+      startClassic(Config(
+        sdkToken: token,
+        flowSteps: parsedClassicConfig.flowSteps,
+        hideLogo: parsedTestingConfig['hideLogo'],
         localisation: {
           'ios_strings_file_name': null,
         },
@@ -39,12 +58,6 @@ class _DevtoolsState extends State<Devtools> {
         theme: theme,
       ));
     }
-
-    if (devtoolsConfig['steps'] != null) {
-      var parsedClassicConfig = parseClassicConfig(devtoolsConfig['steps']);
-
-      startClassic(Config(sdkToken: token, theme: theme, flowSteps: parsedClassicConfig.flowSteps));
-    }
   }
 
   startStudio(Config studioConfig) async {
@@ -52,6 +65,8 @@ class _DevtoolsState extends State<Devtools> {
         sdkToken: studioConfig.sdkToken!,
         iosLocalizationFileName: "onfido_ios_localisation",
         mediaCallback: studioConfig.shouldUseMediaCallbacks != false ? ExampleMediaCallback() : null,
+        biometricTokenCallback:
+            studioConfig.shouldUseBiometricTokenCallback != false ? ExampleBiometricTokenCallback() : null,
         enterpriseFeatures: EnterpriseFeatures(
             hideOnfidoLogo: studioConfig.hideLogo, disableMobileSDKAnalytics: studioConfig.disableMobileSdkAnalytics),
         onfidoTheme: studioConfig.theme);
@@ -62,10 +77,10 @@ class _DevtoolsState extends State<Devtools> {
   startClassic(Config classicConfig) async {
     final Onfido onfido = Onfido(
         sdkToken: classicConfig.sdkToken!,
-        mediaCallback: classicConfig.shouldUseMediaCallbacks != null ? ExampleMediaCallback() : null,
+        mediaCallback: classicConfig.shouldUseMediaCallbacks != false ? ExampleMediaCallback() : null,
         enterpriseFeatures: EnterpriseFeatures(
             hideOnfidoLogo: classicConfig.hideLogo, disableMobileSDKAnalytics: classicConfig.disableMobileSdkAnalytics),
-        nfcOption: classicConfig.disableNFC ?? true ? NFCOptions.DISABLED : NFCOptions.REQUIRED,
+        nfcOption: classicConfig.disableNFC ?? true ? NFCOptions.DISABLED : NFCOptions.OPTIONAL,
         onfidoTheme: classicConfig.theme);
 
     await onfido.start(
@@ -228,11 +243,11 @@ class Config {
   final String? sdkToken;
   final String? workflowRunId;
   final bool? hideLogo;
-  final bool? logoCobrand;
   final Map<String, dynamic>? localisation;
   final Steps? flowSteps;
   final bool? disableNFC;
   final bool? shouldUseMediaCallbacks;
+  final bool? shouldUseBiometricTokenCallback;
   final bool? disableMobileSdkAnalytics;
   final OnfidoTheme? theme;
 
@@ -240,11 +255,11 @@ class Config {
     this.sdkToken,
     this.workflowRunId,
     this.hideLogo,
-    this.logoCobrand,
     this.localisation,
     this.flowSteps,
     this.disableNFC,
     this.shouldUseMediaCallbacks,
+    this.shouldUseBiometricTokenCallback,
     this.disableMobileSdkAnalytics,
     this.theme,
   });

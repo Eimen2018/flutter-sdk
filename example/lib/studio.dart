@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:onfido_sdk/onfido_sdk.dart';
+import 'package:onfido_sdk_example/model/biometric_token_callback.dart';
 
 import 'components/alert_dialog.dart';
 import 'http/onfido_api.dart';
@@ -25,6 +26,8 @@ class _OnfidoStudioState extends State<OnfidoStudio> {
   bool withMediaCallback = false;
   bool disableMobileSDKAnalytics = false;
   OnfidoTheme onfidoTheme = OnfidoTheme.AUTOMATIC;
+  bool studioTokenEnabled = false;
+  bool withBiometricTokenCallback = false;
 
   startWorkflow() async {
     try {
@@ -38,13 +41,19 @@ class _OnfidoStudioState extends State<OnfidoStudio> {
         emailController.text,
       );
       final applicantId = applicant.id!;
-      final sdkToken = await OnfidoApi.instance.createSdkToken(applicantId);
-      final workflowRunId = await OnfidoApi.instance.getWorkflowRunId(applicantId, workflowIdController.text);
+      var sdkToken = await OnfidoApi.instance.createSdkToken(applicantId);
+      final workflowRun = await OnfidoApi.instance.getWorkflowRun(applicantId, workflowIdController.text);
+      final workflowRunId = workflowRun.id!;
+
+      if (studioTokenEnabled) {
+        sdkToken = workflowRun.studioToken!; // use studio token as sdk token
+      }
 
       final Onfido onfido = Onfido(
           sdkToken: sdkToken,
           iosLocalizationFileName: "onfido_ios_localisation",
           mediaCallback: withMediaCallback ? ExampleMediaCallback() : null,
+          biometricTokenCallback: withBiometricTokenCallback ? ExampleBiometricTokenCallback() : null,
           enterpriseFeatures: EnterpriseFeatures(
               hideOnfidoLogo: hideLogo,
               cobrandingText: coBrandTextController.text,
@@ -107,6 +116,17 @@ class _OnfidoStudioState extends State<OnfidoStudio> {
                     labelText: 'Workflow Id',
                   ),
                 ),
+                CheckboxListTile(
+                  title: const Text('Use Studio Token'),
+                  value: studioTokenEnabled,
+                  onChanged: (bool? newValue) {
+                    setState(() {
+                      studioTokenEnabled = newValue!;
+                    });
+                  },
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
                 const SizedBox(height: 30.0),
                 const Text(
                   "General Configuration",
@@ -136,6 +156,17 @@ class _OnfidoStudioState extends State<OnfidoStudio> {
                         ],
                       )
                     ])),
+                CheckboxListTile(
+                  title: const Text('Biometric token callback'),
+                  value: withBiometricTokenCallback,
+                  onChanged: (bool? newValue) {
+                    setState(() {
+                      withBiometricTokenCallback = newValue!;
+                    });
+                  },
+                  contentPadding: EdgeInsets.zero,
+                  controlAffinity: ListTileControlAffinity.leading,
+                ),
                 const SizedBox(height: 30.0),
                 const Text("Enterprise Settings",
                     style: TextStyle(

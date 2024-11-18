@@ -16,7 +16,6 @@ class StartOptionsSerializer {
       'flowSteps': flowSteps.toJson(),
       'iosAppearance': iosAppearance?.toJson(),
       'iosLocalizationFileName': iosLocalizationFileName,
-      'disableNFC': disableNFC,
       'nfcOption': nfcOption?.name,
       'shouldUseMediaCallback': shouldUseMediaCallback,
       'enterpriseFeatures': enterpriseFeatures?.toJson(),

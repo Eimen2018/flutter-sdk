@@ -58,11 +58,16 @@ extension FaceResult {
 
 extension ProofOfAddressResult {
     func serialize() -> Any {
-        return [
-            "id": id,
-            "type": type,
-            "issuingCountry": issuingCountry
+        var data: [String: Any] = [
+            "front": ["id": front.id, "type": front.type],
+            "type": type
         ]
+        
+        if let back {
+            data["back"] = ["id": back.id, "type": back.type]
+        }
+        
+        return data
     }
 }
 

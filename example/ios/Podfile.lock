@@ -3,11 +3,11 @@ PODS:
   - fluttertoast (0.0.2):
     - Flutter
     - Toast
-  - Onfido (30.6.0)
+  - Onfido (32.0.0)
   - onfido_sdk (0.0.1):
     - Flutter
-    - Onfido (~> 30.6.0)
-  - Toast (4.0.0)
+    - Onfido (~> 32.0.0)
+  - Toast (4.1.1)
   - webview_flutter_wkwebview (0.0.1):
     - Flutter
 
@@ -35,10 +35,10 @@ EXTERNAL SOURCES:
 SPEC CHECKSUMS:
   Flutter: e0871f40cf51350855a761d2e70bf5af5b9b5de7
   fluttertoast: 31b00dabfa7fb7bacd9e7dbee580d7a2ff4bf265
-  Onfido: f2827394d4b92821cf13007b4fa99094f06e29ed
-  onfido_sdk: e8ab3031ba138b557a04701a35d664022654286f
-  Toast: 91b396c56ee72a5790816f40d3a94dd357abc196
-  webview_flutter_wkwebview: be0f0d33777f1bfd0c9fdcb594786704dbf65f36
+  Onfido: 11fc5e2ce6571f8895b25e526a3a321a5af9eaa9
+  onfido_sdk: f69f7d724005e4cd53c899328a3ccfe34353a8e9
+  Toast: 1f5ea13423a1e6674c4abdac5be53587ae481c4e
+  webview_flutter_wkwebview: 2a23822e9039b7b1bc52e5add778e5d89ad488d1
 
 PODFILE CHECKSUM: 2df34406235323a1c0746085252b416658715cea
 

@@ -17,3 +17,5 @@ export 'package:onfido_sdk/src/model/ios_appearance.dart';
 export 'package:onfido_sdk/src/model/onfido_theme.dart';
 export 'package:onfido_sdk/src/model/background_color.dart';
 export 'package:onfido_sdk/src/model/nfc_options.dart';
+export 'package:onfido_sdk/src/model/biometric_token_callback.dart';
+export 'package:onfido_sdk/src/model/biometric_token_result.dart';

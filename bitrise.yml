@@ -64,8 +64,12 @@ workflows:
             - project_path: example/ios/Runner.xcworkspace
             - scheme: Runner
             - distribution_method: enterprise
-            - xcodebuild_options: "-derivedDataPath example/derived_data -quiet"
             - output_tool: xcpretty
+      - export-xcarchive:
+          title: Export app-store IPA
+          inputs:
+          - archive_path: $BITRISE_XCARCHIVE_PATH
+          - export_method: enterprise
       - cache-push@2: {}
       - deploy-to-bitrise-io@2: {}
 

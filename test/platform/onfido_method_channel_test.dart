@@ -41,7 +41,6 @@ void main() {
                 DocumentCapture(countryCode: CountryCode.UGA, documentType: DocumentType.nationalIdentityCard),
             faceCapture: FaceCapture.video(),
           ),
-          disableNFC: false,
           nfcOption: NFCOptions.OPTIONAL,
           onfidoTheme: OnfidoTheme.LIGHT);
 

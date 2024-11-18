@@ -10,6 +10,7 @@
 - [4. Completing a session](#completing-a-session)
 - [Advanced flow customization](#advanced-flow-customization)
 - [Advanced callbacks](#advanced-callbacks)
+- [Custom media callbacks](#custom-media-callbacks)
 - [More information](#more-information)
 - [Raising support issues](#support)
 
@@ -161,7 +162,7 @@ final Onfido onfido = Onfido(
   sdkToken: "<YOUR_SDK_TOKEN>",
   iosLocalizationFileName: "onfido_ios_localisation", // Optional
   onfidoTheme: OnfidoTheme.AUTOMATIC, // Optional
-  disableNFC: "true" // Optional
+  nfcOption: NFCOptions.Disabled // Optional
 );
 ```
 
@@ -176,8 +177,6 @@ final Onfido onfido = Onfido(
   and instead set a theme statically at the build time. In this case, the flow will always be in displayed
   in the selected theme regardless of the user's device theme.
     * Valid values in `OnfidoTheme`: `AUTOMATIC`, `LIGHT`, `DARK`.
-* **`disableNFC`**: **Optional**. Set this parameter to `true` to disable NFC. 
-	* **DEPRECATED**. Use `nfcOption` parameter to manage NFC settings
 * **`nfcOption`**: **Optional**. To configure NFC. There are three NFC options:
   * `DISABLED`: NFC reading will not be asked of end-users
   * `OPTIONAL` (Default): NFC reading will be attempted, if possible
@@ -301,39 +300,15 @@ final Onfido onfido = Onfido(
 
 ## Completing a session
 
-### Media Callbacks
+### Handling callbacks
 
-#### Introduction
+When the Onfido SDK session concludes, a range of completion callback functions may be triggered.
 
-Onfido provides the possibility to integrate with our Smart Capture SDK, without the requirement of using this data only through the Onfido API. Media callbacks enable you to control the end user data collected by the SDK after the end user has submitted their captured media. As a result, you can leverage Onfido’s advanced on-device technology, including image quality validations, while still being able to handle end users’ data directly. This unlocks additional use cases, including compliance requirements and multi-vendor configurations, that require this additional flexibility.
+For detailed information regarding handling callbacks for identity verification workflows orchestrated using Onfido Studio, please refer to our native [iOS](https://documentation.onfido.com/sdk/ios/#handling-callbacks) and [Android](https://documentation.onfido.com/sdk/android/#handling-callbacks) documentation.
 
-**This feature must be enabled for your account.** Please contact your Onfido Solution Engineer or Customer Success Manager.
+For callbacks for manually-defined verification flows implemented without Onfido Studio, please refer to the [section below](#advanced-callbacks). 
 
-#### Implementation
-To use this feature, implement the `OnfidoMediaCallback` interface and provide the callback for `OnfidoMediaResult` for documents, live photos and live videos:
-
-```dart
-class MediaCallback implements OnfidoMediaCallback {
-  @override
-  Future<void> onMediaCaptured({required OnfidoMediaResult result}) async {
-    // Your callback code here
-  }
-}
-```
-
-Then you should pass this class to Onfido SDK builder as a parameter:
-
-```dart
-MediaCallback callback = MediaCallback();
-
-final Onfido onfido = Onfido(
-    sdkToken: sdkToken,
-    mediaCallback: callback,
-    enterpriseFeatures: EnterpriseFeatures(
-        hideOnfidoLogo: _hideOnfidoLogo,
-    )
-);    
-```
+For documentation regarding advanced callbacks used for returning media uploaded by the end user (such as identity documents or face captures), please refer to the [Custom Media Callbacks](#custom-media-callbacks) section of this document.
 
 ### Generating verification reports
 
@@ -412,6 +387,10 @@ startOnfido() async {
 
 ## Advanced callbacks
 
+### Handling callbacks
+
+When the Onfido SDK session concludes, a range of completion callback functions may be triggered. The callbacks detailed in this section apply to manually-defined identity verification flows implemented without Onfido Studio. For callbacks for verification workflows orchestrated using Onfido Studio, please refer to the [section above](#completing-a-session).
+
 ### Success Response
 
 When the user has reached the end of the flow, you will receive the response with `[OnfidoResult]`, a list with multiple results. 
@@ -430,9 +409,9 @@ OnfidoResult(
     variant: FaceCaptureType.video,
   ),
   proofOfAddress: ProofOfAddressResult(
-    id: "id",
-    type: "bank_building_society_statement",
-    issuingCountry: "BRA",
+    type: "type",
+    front: ProofOfAddressDocumentSide(id: "side1_id", type?:"bank_building_society_statement"),
+    back?: ProofOfAddressDocumentSide(id: "side2_id", type?:"bank_building_society_statement"),
   ),
 );
 ```
@@ -472,11 +451,150 @@ The `Error` object returned as part of `PlatformException` translates the errors
       // The flow was exited prematurely by the user. The reason can be `.userExit` or `.consentDenied`
 ```
 
-### Handling callbacks
+### Custom biometric token storage
 
-When the Onfido SDK session concludes, a range of callback functions may be triggered.
+When using the authentication with local storage solution, by default the SDK manages biometric token storage. The SDK also allows the clients to take control of the token lifecycle and exposes an API to override the default implementation to read and write the token, so it can be stored on device, in cloud, in a keystore or on your premises.
 
-For documentation regarding handling callbacks, please refer to our native [iOS](https://documentation.onfido.com/sdk/ios/#handling-callbacks-1) and [Android](https://documentation.onfido.com/sdk/android/#handling-callbacks-1) documentation.
+#### Implementation
+
+1. Provide a custom implementation for `BiometricTokenCallback`
+Please note that `BiometricTokenCallback` uses `customerUserHash` parameter. This is a unique identifier for the user that can be used as a key for token storage. Feel free to ignore it if you have your own identifier.
+
+```dart
+class ExampleBiometricTokenCallback implements BiometricTokenCallback {
+  @override
+  void onTokenGenerated(String customerUserHash, String biometricToken) {
+     // Called when new biometric token is generated during onboarding
+     // Use this callback to securely store the biometric token
+  }
+
+  @override
+  void onTokenRequested(String customerUserHash, ProvideToken provideToken) {
+     // Called when biometric token is requested during re-authentication
+     // Provide the token to the SDK via provideToken.invoke(<biometricToken>);
+  }
+}
+```
+
+2. Set your implementation of `BiometricTokenCallback`
+
+```dart
+final Onfido onfido = Onfido(
+    biometricTokenCallback: ExampleBiometricTokenCallback(),
+    // ...
+);
+
+```
+
+## Custom Media Callbacks
+
+### Introduction
+
+Onfido provides the possibility to integrate with our Smart Capture SDK, without the requirement of using this data only through the Onfido API. Media callbacks enable you to control the end user data collected by the SDK after the end user has submitted their captured media. As a result, you can leverage Onfido’s advanced on-device technology, including image quality validations, while still being able to handle end users’ data directly. This unlocks additional use cases, including compliance requirements and multi-vendor configurations, that require this additional flexibility.
+
+**This feature must be enabled for your account.** Please contact your Onfido Solution Engineer or Customer Success Manager.
+
+#### Implementation
+To use this feature, implement the `OnfidoMediaCallback` interface and provide the callback for `OnfidoMediaResult` for documents, live photos and live videos:
+
+```dart
+class MediaCallback implements OnfidoMediaCallback {
+  @override
+  Future<void> onMediaCaptured({required OnfidoMediaResult result}) async {
+    // Your callback code here
+  }
+}
+```
+
+Then you should pass this class to Onfido SDK builder as a parameter:
+
+```dart
+MediaCallback callback = MediaCallback();
+
+final Onfido onfido = Onfido(
+    mediaCallback: callback
+);    
+```
+
+The callback returns 3 possible objects. Please note that `resultType` refers to the type of the media capture in each case.
+These can be `documentResult`, `selfieResult` or `livenessResult`.
+
+1. For documents (`resultType` is `documentResult`), the callback returns:
+
+```json5
+{
+ resultType: OnfidoMediaResultType
+ fileData: OnfidoMediaFile
+ documentMetadata: OnfidoDocumentMetadata
+}
+```
+
+where `fileData` is an object of the following structure:
+
+```json5
+{
+  fileData: Uint8List 
+  fileType: String
+  fileName: String
+}
+```
+
+and `documentMetadata` is an object of the following structure:
+
+```json5
+{
+  side: String
+  type: String
+  issuingCountry: String?
+}
+```
+
+**Notes:**
+- `issuingCountry` is optional based on end-user selection, and can be `null`.
+- `fileData` is a `Uint8List` representation of the byte array data corresponding to the captured photo of the document.
+- If a document was scanned using NFC, the callback will return the passport photo in `fileData` but no additional data.
+
+2. For live photos (`resultType` is `selfieResult`), the callback returns:
+
+```json5
+{
+ resultType: OnfidoMediaResultType
+ fileData: OnfidoMediaFile
+ documentMetadata: OnfidoDocumentMetadata?
+}
+```
+
+where `documentMetadata` will always be `null` and `fileData` is an object of the following structure:
+
+```json5
+{
+  fileData: Uint8List
+  fileType: String
+  fileName: String
+}
+```
+
+**Note:** `fileData` is a `Uint8List` representation of the byte array data corresponding to the captured live photo.
+
+3. For live videos (`resultType` is `livenessResult`), the callback returns:
+
+```json5
+{
+ resultType: OnfidoMediaResultType
+ fileData: OnfidoMediaFile
+ documentMetadata: OnfidoDocumentMetadata?
+}
+```
+
+where documentMetadata will always be null and  fileData is an object of the following structure:
+
+```json5
+{
+  fileData: Uint8List 
+  fileType: String
+  fileName: String
+}
+```
 
 ## More Information
 

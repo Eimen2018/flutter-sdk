@@ -11,9 +11,9 @@ class MockOnfidoPlatform with MockPlatformInterfaceMixin implements OnfidoPlatfo
   late FlowSteps startFlowSteps;
   late String? startIosLocalizationFileName;
   late EnterpriseFeatures? startEnterpriseFeatures;
-  late bool? withNFCDisabled;
   late NFCOptions? withNfcOption;
   late OnfidoMediaCallback? customMediaCallback;
+  late BiometricTokenCallback? customBiometricTokenCallback;
   late OnfidoTheme? theme;
 
   @override
@@ -23,7 +23,6 @@ class MockOnfidoPlatform with MockPlatformInterfaceMixin implements OnfidoPlatfo
       String? iosLocalizationFileName,
       IOSAppearance? iosAppearance,
       EnterpriseFeatures? enterpriseFeatures,
-      bool? disableNFC,
       NFCOptions? nfcOption,
       OnfidoMediaCallback? mediaCallback,
       OnfidoTheme? onfidoTheme}) {
@@ -32,7 +31,6 @@ class MockOnfidoPlatform with MockPlatformInterfaceMixin implements OnfidoPlatfo
     startFlowSteps = flowSteps;
     startIosLocalizationFileName = iosLocalizationFileName;
     startEnterpriseFeatures = enterpriseFeatures;
-    withNFCDisabled = disableNFC;
     withNfcOption = nfcOption;
     customMediaCallback = mediaCallback;
     theme = onfidoTheme;
@@ -51,6 +49,7 @@ class MockOnfidoPlatform with MockPlatformInterfaceMixin implements OnfidoPlatfo
       String? iosLocalizationFileName,
       IOSAppearance? iosAppearance,
       OnfidoMediaCallback? mediaCallback,
+      BiometricTokenCallback? biometricTokenCallback,
       EnterpriseFeatures? enterpriseFeatures,
       OnfidoTheme? onfidoTheme}) {
     startStudioCount++;
@@ -58,6 +57,7 @@ class MockOnfidoPlatform with MockPlatformInterfaceMixin implements OnfidoPlatfo
     startStudioWorkflowRunId = workflowRunId;
     startStudioEnterpriseFeatures = enterpriseFeatures;
     customMediaCallback = mediaCallback;
+    customBiometricTokenCallback = biometricTokenCallback;
     theme = onfidoTheme;
     return Future.value();
   }
