@@ -2,6 +2,7 @@ package com.onfido.sdk.flutter.serializer
 
 import com.onfido.workflow.WorkflowConfig
 import com.onfido.android.sdk.capture.EnterpriseFeatures
+import com.onfido.sdk.flutter.helpers.BiometricTokenCallbackBridge
 import com.onfido.sdk.flutter.helpers.CustomMediaCallback
 
 fun Any.deserializeWorkflowConfig(): WorkflowConfig {
@@ -18,6 +19,11 @@ fun Any.deserializeWorkflowConfig(): WorkflowConfig {
     val withMediaCallback = this["shouldUseMediaCallback"] as? Boolean ?: false
     if (withMediaCallback) {
         builder.withMediaCallback(mediaCallback = CustomMediaCallback())
+    }
+
+    val withBiometricTokenCallback = this["shouldUseBiometricTokenCallback"] as? Boolean ?: false
+    if (withBiometricTokenCallback) {
+        builder.withBiometricTokenCallback(tokenCallback = BiometricTokenCallbackBridge())
     }
 
     val enterpriseFeatures = this["enterpriseFeatures"] as? Map<*, *>

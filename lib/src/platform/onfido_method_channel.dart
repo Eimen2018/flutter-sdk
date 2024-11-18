@@ -1,6 +1,9 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:onfido_sdk/onfido_sdk.dart';
+import 'package:onfido_sdk/src/serializer/biometric_token_result_serializer.dart';
 import 'package:onfido_sdk/src/serializer/serializer.dart';
 
 class MethodChannelOnfido extends OnfidoPlatform {
@@ -16,6 +19,7 @@ class MethodChannelOnfido extends OnfidoPlatform {
   }
 
   static OnfidoMediaCallback? _mediaCallback;
+  static BiometricTokenCallback? _biometricTokenCallback;
 
   @override
   Future<List<OnfidoResult>> start(
@@ -25,7 +29,6 @@ class MethodChannelOnfido extends OnfidoPlatform {
       IOSAppearance? iosAppearance,
       OnfidoMediaCallback? mediaCallback,
       EnterpriseFeatures? enterpriseFeatures,
-      bool? disableNFC,
       NFCOptions? nfcOption,
       OnfidoTheme? onfidoTheme}) async {
     final arguments = StartOptionsSerializer.serialize(
@@ -35,7 +38,6 @@ class MethodChannelOnfido extends OnfidoPlatform {
         shouldUseMediaCallback: mediaCallback != null,
         iosLocalizationFileName: iosLocalizationFileName,
         enterpriseFeatures: enterpriseFeatures,
-        disableNFC: disableNFC,
         nfcOption: nfcOption,
         onfidoTheme: onfidoTheme);
 
@@ -51,6 +53,7 @@ class MethodChannelOnfido extends OnfidoPlatform {
       required String workflowRunId,
       IOSAppearance? iosAppearance,
       OnfidoMediaCallback? mediaCallback,
+      BiometricTokenCallback? biometricTokenCallback,
       String? iosLocalizationFileName,
       EnterpriseFeatures? enterpriseFeatures,
       OnfidoTheme? onfidoTheme}) async {
@@ -59,16 +62,18 @@ class MethodChannelOnfido extends OnfidoPlatform {
         workflowRunId: workflowRunId,
         iosAppearance: iosAppearance,
         shouldUseMediaCallback: mediaCallback != null,
+        shouldUseBiometricTokenCallback: biometricTokenCallback != null,
         iosLocalizationFileName: iosLocalizationFileName,
         enterpriseFeatures: enterpriseFeatures,
         onfidoTheme: onfidoTheme);
 
     _mediaCallback = mediaCallback;
+    _biometricTokenCallback = biometricTokenCallback;
 
     await methodChannel.invokeMethod('startStudio', arguments);
   }
 
-  static Future<void> platformCallHandler(MethodCall call) {
+  static Future<dynamic> platformCallHandler(MethodCall call) async {
     try {
       switch (call.method) {
         case 'onMediaCaptured':
@@ -79,6 +84,21 @@ class MethodChannelOnfido extends OnfidoPlatform {
             final OnfidoMediaResult result = OnfidoMediaResultSerializer.deserialize(call.arguments);
             _mediaCallback?.onMediaCaptured(result: result);
             break;
+          }
+        case 'onTokenGenerated':
+          {
+            final BiometricTokenGenerationResult args = BiometricTokenResultSerializer.deserialize(call.arguments);
+            _biometricTokenCallback?.onTokenGenerated(args.customerUserHash, args.biometricToken);
+            break;
+          }
+        case 'onTokenRequested':
+          {
+            final BiometricTokenRequestResult args = BiometricTokenResultSerializer.deserializeRequest(call.arguments);
+            final Completer<String> completer = Completer<String>();
+            _biometricTokenCallback?.onTokenRequested(args.customerUserHash, (String biometricToken) {
+              completer.complete(biometricToken);
+            });
+            return completer.future;
           }
         default:
           if (kDebugMode) {

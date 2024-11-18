@@ -1,10 +1,9 @@
-group 'com.onfido.sdk.flutter'
 version '1.0'
 
-def onfidoSdkVersion = '21.2.+'
+def onfidoSdkVersion = '22.0.+'
 
 buildscript {
-    ext.kotlin_version = '1.6.10'
+    ext.kotlin_version = '1.9.22'
 
     repositories {
         google()
@@ -12,7 +11,7 @@ buildscript {
     }
 
     dependencies {
-        classpath 'com.android.tools.build:gradle:7.4.2'
+        classpath 'com.android.tools.build:gradle:8.5.0'
         classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
@@ -29,14 +28,14 @@ apply plugin: 'kotlin-android'
 
 android {
     compileSdkVersion 34
-
+    namespace 'com.onfido.sdk.flutter'
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
 
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = JavaVersion.VERSION_11.toString()
     }
 
     sourceSets {

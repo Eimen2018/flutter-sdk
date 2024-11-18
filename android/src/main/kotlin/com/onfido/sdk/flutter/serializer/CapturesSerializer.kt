@@ -3,6 +3,8 @@ package com.onfido.sdk.flutter.serializer
 import com.onfido.android.sdk.capture.upload.Captures
 import com.onfido.android.sdk.capture.upload.Document
 import com.onfido.android.sdk.capture.upload.Face
+import com.onfido.android.sdk.capture.upload.ProofOfAddress
+import com.onfido.android.sdk.capture.upload.ProofOfAddress.ProofOfAddressDocumentSide
 
 
 internal fun Captures.toFlutterResult(): Any {
@@ -14,6 +16,10 @@ internal fun Captures.toFlutterResult(): Any {
 
     this.face?.let {
         elements["face"] = it.deserialize()
+    }
+
+    this.poa?.let {
+        elements["proofOfAddress"] = it.deserialize()
     }
 
     return listOf(elements)
@@ -38,4 +44,21 @@ private fun Document.deserialize(): Map<*, *> {
     }
 
     return map
+}
+
+private fun ProofOfAddress.deserialize(): Map<*, *> {
+    val map = mutableMapOf<String, Any>()
+    map["type"] = this.type
+
+    map["front"] = front.deserialize()
+
+    back?.let {
+        map["back"] = it.deserialize()
+    }
+
+    return map
+}
+
+private fun ProofOfAddressDocumentSide.deserialize(): Map<*, *> {
+    return mapOf("id" to id, "type" to type)
 }

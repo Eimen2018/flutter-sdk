@@ -12,8 +12,7 @@ import io.flutter.embedding.engine.plugins.FlutterPlugin
 import com.onfido.android.sdk.capture.model.NFCOptions
 
 internal fun Any?.deserializeOnfidoBuilder(
-    context: Context,
-    assets: FlutterPlugin.FlutterAssets,
+    context: Context
 ): OnfidoConfig.Builder {
     if (this !is Map<*, *>) throw Exception("Invalid arguments for start method")
 
@@ -93,10 +92,6 @@ internal fun Any?.deserializeOnfidoBuilder(
     val enterpriseFeatures = this["enterpriseFeatures"] as? Map<*, *> ?: return builder
     val features = EnterpriseFeatures.buildFromMap(enterpriseFeatures)
     builder.withEnterpriseFeatures(features)
-
-    if (this["disableNFC"] as? Boolean == true) {
-        builder.withNFC(NFCOptions.Disabled)
-    }
 
     val nfcOption = this["nfcOption"] as? String
     if (nfcOption != null) {

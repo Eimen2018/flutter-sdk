@@ -20,7 +20,7 @@ internal class StartMethod(
 
     override fun invoke(call: MethodCall, result: MethodChannel.Result) {
         val activity = activityProvider.provide() ?: throw Exception("Invalid activity")
-        val onfidoBuilder = call.arguments.deserializeOnfidoBuilder(activity, assets).build()
+        val onfidoBuilder = call.arguments.deserializeOnfidoBuilder(activity).build()
         this.client.startActivityForResult(activity, startRequestCode, onfidoBuilder)
     }
 }

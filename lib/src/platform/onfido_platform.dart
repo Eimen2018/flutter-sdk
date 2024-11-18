@@ -11,7 +11,6 @@ abstract class OnfidoPlatform {
       String? iosLocalizationFileName,
       IOSAppearance? iosAppearance,
       EnterpriseFeatures? enterpriseFeatures,
-      bool? disableNFC,
       NFCOptions? nfcOption,
       OnfidoMediaCallback? mediaCallback,
       OnfidoTheme? onfidoTheme});
@@ -21,6 +20,7 @@ abstract class OnfidoPlatform {
       required String workflowRunId,
       IOSAppearance? iosAppearance,
       OnfidoMediaCallback? mediaCallback,
+      BiometricTokenCallback? biometricTokenCallback,
       String? iosLocalizationFileName,
       EnterpriseFeatures? enterpriseFeatures,
       OnfidoTheme? onfidoTheme});

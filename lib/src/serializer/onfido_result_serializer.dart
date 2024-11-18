@@ -38,6 +38,13 @@ class OnfidoResultSerializer {
   }
 
   static ProofOfAddressResult _deserializeProofOfAddressResult(dynamic value) {
-    return ProofOfAddressResult(id: value["id"], issuingCountry: value["issuingCountry"], type: value["type"]);
+    return ProofOfAddressResult(
+        type: value["type"],
+        front: _deserializeProofOfAddressDocumentSide(value["front"]),
+        back: value["back"] != null ? _deserializeProofOfAddressDocumentSide(value["back"]) : null);
+  }
+
+  static ProofOfAddressDocumentSide _deserializeProofOfAddressDocumentSide(dynamic value) {
+    return ProofOfAddressDocumentSide(id: value["id"], type: value["type"]);
   }
 }

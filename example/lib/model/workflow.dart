@@ -1,10 +1,12 @@
 class Workflow {
   String? id;
+  String? studioToken;
 
-  Workflow({this.id});
+  Workflow({this.id, this.studioToken});
 
   Workflow.fromJson(Map<String, dynamic> json) {
     id = json['id'];
+    studioToken = json['sdk_token'];
   }
 
   Map<String, dynamic> toJson() {
