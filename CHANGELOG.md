@@ -4,6 +4,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](http://keepachangelog.com/en/1.0.0/)
 and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html).
 
+## [8.1.0] - 2024-12-05
+
+- Update underlying Onfido native SDK versions:
+  - Android 22.1.+ (up from 22.0.+)
+  - iOS 32.1.+ (up from 32.0.+)
+
 ## [8.0.0] - 2024-11-7
 
 - Removed `disableNFC` parameter (Use `nfcOption` with `NFCOptions.Disabled` value instead)
